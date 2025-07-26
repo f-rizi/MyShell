@@ -13,7 +13,7 @@ TEST_DIR   = tests
 # Application source and object files
 SRCS = $(shell find $(SRC_DIR) -type f -name '*.c')
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
-TARGET = $(BIN_DIR)/myshell
+TARGET = $(BIN_DIR)/rzsh
 
 # Check test files
 CHECK_SRCS = $(shell find $(TEST_DIR) -type f -name 'test_*.c')

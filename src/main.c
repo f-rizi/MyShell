@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <lexer.h>
 
-#define PROMPT "myshell$ "
+#define PROMPT "rzsh$ "
 
 static int run_one_command(const char *cmdline)
 {
