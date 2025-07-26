@@ -49,32 +49,28 @@ cmd_t *parse(char **tokens)
         {
             if (((strcmp(*tkn, ">") == 0) || (strcmp(*tkn, ">>") == 0)))
             {
-                tkn++;
-
-                if (!tkn)
-                {
-                    break;
-                }
-
                 if (strcmp(*tkn, ">>") == 0)
                 {
                     cmd->append = true;
                 }
 
-                cmd->outfile = strdup(*tkn);
                 tkn++;
+
+                if (*tkn)
+                {
+                    cmd->outfile = strdup(*tkn);
+                    tkn++;
+                }
             }
             else if ((strcmp(*tkn, "<") == 0))
             {
                 tkn++;
 
-                if (!tkn)
+                if (*tkn)
                 {
-                    break;
+                    cmd->infile = strdup(*tkn);
+                    tkn++;
                 }
-
-                cmd->infile = strdup(*tkn);
-                tkn++;
             }
             else
             {
