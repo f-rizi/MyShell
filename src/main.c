@@ -49,7 +49,7 @@ static int run_one_command(const char *cmdline)
 
     free(argv);
 
-    // Did the child finished normally?
+    // Child finished normally?
     if (WIFEXITED(wstatus))
     {
         return WEXITSTATUS(wstatus);
