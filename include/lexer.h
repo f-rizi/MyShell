@@ -9,4 +9,4 @@
  */
 char **lex(const char *line);
 
-#endif
+#endif // LEXER_H
