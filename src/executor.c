@@ -28,8 +28,6 @@ static int run_one_command(cmd_t *cmd)
                 _exit(1);
             }
 
-            dup2(fd_in, STDIN_FILENO);
-
             if (dup2(fd_in, STDIN_FILENO) < 0)
             {
                 perror("dup2");
@@ -46,13 +44,11 @@ static int run_one_command(cmd_t *cmd)
 
             if (fd_out < 0)
             {
-                perror(cmd->infile);
+                perror(cmd->outfile);
                 _exit(1);
             }
 
-            dup2(fd_out, STDOUT_FILENO);
-
-            if (dup2(fd_out, STDIN_FILENO) < 0)
+            if (dup2(fd_out, STDOUT_FILENO) < 0)
             {
                 perror("dup2");
                 _exit(1);
@@ -67,16 +63,23 @@ static int run_one_command(cmd_t *cmd)
         _exit(127);
     }
 
-    int wstatus;
-    waitpid(pid, &wstatus, 0);
-
-    // Child finished normally?
-    if (WIFEXITED(wstatus))
+    if (cmd->background)
     {
-        return WEXITSTATUS(wstatus);
+        return 0;
     }
+    else
+    {
+        int wstatus;
+        waitpid(pid, &wstatus, 0);
 
-    return 1;
+        // Child finished normally?
+        if (WIFEXITED(wstatus))
+        {
+            return WEXITSTATUS(wstatus);
+        }
+
+        return 1;
+    }
 }
 
 int exec_cmds(cmd_t *head)
