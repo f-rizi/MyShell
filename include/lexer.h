@@ -3,6 +3,11 @@
 
 #include <stdlib.h>
 
+
+void free_tokens_null_terminated(char **tokens);
+
+void free_tokens_with_count(char **tokens, size_t count);
+
 /**
  * Split 'line' into a NULL-terminated array of strings.
  * The caller owns both the array and each string.

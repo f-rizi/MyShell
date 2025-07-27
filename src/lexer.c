@@ -5,7 +5,21 @@
 
 #include "../include/lexer.h"
 
-static void free_tokens(char **tokens, size_t count)
+void free_tokens_null_terminated(char **tokens)
+{
+    char **ptr = tokens;
+
+    while (*ptr)
+    {
+        char **next = (ptr + 1);
+        free(*tokens);
+        ptr = next;
+    }
+
+    free(tokens);
+}
+
+void free_tokens_with_count(char **tokens, size_t count)
 {
     for (size_t i = 0; i < count; ++i)
     {
@@ -57,7 +71,7 @@ char **lex(const char *line)
         char *buf = malloc(buf_cap);
         if (!buf)
         {
-            free_tokens(tokens, toks_cnt);
+            free_tokens_with_count(tokens, toks_cnt);
             return NULL;
         }
 
@@ -77,8 +91,8 @@ char **lex(const char *line)
             else if ((ch == '"' || ch == '\'') && (buf_len == 0 || has_matching_quote(line, idx + 1, len, ch)))
             {
                 char quote = ch;
-                idx++; 
-                
+                idx++;
+
                 while (idx < len && line[idx] != quote)
                 {
                     if (line[idx] == '\\' && idx + 1 < len)
@@ -102,13 +116,13 @@ char **lex(const char *line)
                         if (!tmp)
                         {
                             free(buf);
-                            free_tokens(tokens, toks_cnt);
+                            free_tokens_with_count(tokens, toks_cnt);
                             return NULL;
                         }
 
                         buf = tmp;
                     }
-                    
+
                     buf[buf_len++] = ch;
                 }
 
@@ -132,7 +146,7 @@ char **lex(const char *line)
                 if (!tmp)
                 {
                     free(buf);
-                    free_tokens(tokens, toks_cnt);
+                    free_tokens_with_count(tokens, toks_cnt);
                     return NULL;
                 }
 
@@ -154,7 +168,7 @@ char **lex(const char *line)
                 if (!tmp)
                 {
                     free(buf);
-                    free_tokens(tokens, toks_cnt);
+                    free_tokens_with_count(tokens, toks_cnt);
                     return NULL;
                 }
 

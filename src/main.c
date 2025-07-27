@@ -3,59 +3,29 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <lexer.h>
+
+#include <../include/parser.h>
+#include <../include/lexer.h>
+#include <../include/executor.h>
 
 #define PROMPT "rzsh$ "
 
-static int run_one_command(const char *cmdline)
+void handle_sigint(int sig)
 {
-    char **argv = lex(cmdline);
-    if (!argv)
+    printf("\n%s", PROMPT);
+    fflush(stdout);
+}
+
+void handle_sigchld(int sig)
+{
+    printf("\nCaught signal %d (Ctrl+C)\n", sig);
+
+    pid_t pid;
+    int status;
+
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
     {
-        return 1;
     }
-
-    pid_t pid = fork();
-    if (pid < 0)
-    {
-        perror("fork");
-
-        for (char **p = argv; *p; p++)
-        {
-            free(*p);
-        }
-
-        free(argv);
-        return 1;
-    }
-
-    // Is this child process?
-    if (pid == 0)
-    {
-        execvp(argv[0], argv);
-        perror("execvp");
-
-        // Clean, proper exit for failed exec (127 = command not found)
-        _exit(127);
-    }
-
-    int wstatus;
-    waitpid(pid, &wstatus, 0);
-
-    for (char **p = argv; *p; p++)
-    {
-        free(*p);
-    }
-
-    free(argv);
-
-    // Child finished normally?
-    if (WIFEXITED(wstatus))
-    {
-        return WEXITSTATUS(wstatus);
-    }
-
-    return 1;
 }
 
 int main(int argc, char *argv[])
@@ -63,6 +33,9 @@ int main(int argc, char *argv[])
     char *line = NULL;
     size_t len = 0;
     ssize_t nread = 0;
+
+    signal(SIGCHLD, handle_sigchld);
+    signal(SIGINT, handle_sigint);
 
     while (1)
     {
@@ -77,9 +50,12 @@ int main(int argc, char *argv[])
             break;
         }
 
-        run_one_command(line);
+        char **tokens = lex(line);
+        cmd_t *cmds = parse(tokens);
+
+        exec_cmds(cmds);
+        free_cmds(cmds);
     }
 
-    free(line);
     return 0;
 }

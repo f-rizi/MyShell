@@ -16,4 +16,4 @@
  */
 int exec_cmds(cmd_t *head);
 
-#endif
+#endif // EXECUTOR_H

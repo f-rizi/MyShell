@@ -14,4 +14,4 @@ bool is_builtin(const char *cmd);
  */
 int run_builtin(int argc, char *argv[]);
 
-#endif
+#endif // BUILTINS
